@@ -18,4 +18,8 @@ class UserService(
     fun findByEmail(email: String): User? {
         return this.userRepository.findByEmail(email)
     }
+
+    fun getById(id: Int): User {
+        return this.userRepository.getById(id)
+    }
 }

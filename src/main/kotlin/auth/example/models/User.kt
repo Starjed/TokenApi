@@ -1,5 +1,6 @@
 package auth.example.models
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -18,13 +19,14 @@ class User {
     var email = ""
 
     var password = ""
+        @JsonIgnore
         get() = field
         set(value) {
             val passwordEncoder = BCryptPasswordEncoder()
             field = passwordEncoder.encode(value)
         }
 
-    public fun comparePassword(password: String): Boolean {
+     fun comparePassword(password: String): Boolean {
         return BCryptPasswordEncoder().matches(password, this.password)
     }
 }
