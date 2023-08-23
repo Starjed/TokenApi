@@ -23,9 +23,7 @@ class AuthController(private val userService: UserService) {
     @PostMapping("register")
     fun register(@RequestBody body: RegisterDTO): ResponseEntity<Any> {
         val user = User()
-        user.name = body.name
-        user.email = body.email
-        user.password = body.password
+        user.register(body.name, body.email, body.password)
 
         val existingUser = userService.findByEmail(body.email)
 
