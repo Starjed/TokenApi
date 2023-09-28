@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+  token-api:
+    ports:
+      - 8080:8080
+    image: token-api
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: windson
+      MONGO_INITDB_ROOT_PASSWORD: windson
+    ports:
+      - 27017:27017
