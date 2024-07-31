@@ -5,13 +5,12 @@ import auth.example.dtos.Message
 import auth.example.dtos.RegisterDTO
 import auth.example.models.User
 import auth.example.services.UserService
-import io.jsonwebtoken.Jwt
-import org.springframework.http.ResponseEntity
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -22,28 +21,28 @@ class AuthController(private val userService: UserService) {
 
     @PostMapping("register")
     fun register(@RequestBody body: RegisterDTO): ResponseEntity<Any> {
-        val user = User()
-        user.register(body.name, body.email, body.password)
-
         val existingUser = userService.findByEmail(body.email)
 
-        if (existingUser != null)
-            ResponseEntity.badRequest().body(Message("E-mail already in use."))
+        if (existingUser != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Message("E-mail already in use."))
+        } else {
 
-        val savedUser = userService.save(user)
+            val newUser = User(body.name, body.email, body.password)
 
-        return ResponseEntity.ok(savedUser)
+            userService.save(newUser)
+
+            return ResponseEntity.ok(newUser)
+        }
     }
 
     @PostMapping("login")
     fun login(@RequestBody body: LoginDTO, response: HttpServletResponse): ResponseEntity<Any> {
         val user = this.userService.findByEmail(body.email)
-            ?: return ResponseEntity.badRequest().body(Message("user not found! :( "))
+            ?: return ResponseEntity.notFound().build()
 
         if (!user.comparePassword(body.password)) {
-            return ResponseEntity.badRequest().body(Message("bad password! :( "))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Message("Bad password! :("))
         }
-
         val issuer = user.id.toString()
 
         val jwt = Jwts.builder()
